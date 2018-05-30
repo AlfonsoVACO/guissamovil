@@ -1,0 +1,82 @@
+[
+	{
+		"apellidos":"Vásquez Cortes",
+		"correo":"alvaco93@gmail.com",
+		"direccion":"Av. Juarez No 92",
+		"idNegocio":{
+			"descripcion":"<p>Como sea esto bien chido</p>\n",
+			"direccion":"Juan N. Alvarez 34",
+			"estado":0,
+			"fecha":"2018-03-12T19:50:21-06:00",
+			"idEstado":{
+				"idEstado":7,
+				"nombre":"Guerrero"
+			},
+			"idMunicipio":{
+				"idMunicipio":6,
+				"nombreMun":"Atlixtac"
+			},
+			"idNegocio":2,
+			"idUser":{
+				"apellidos":"Gonzales Contreras",
+				"avatar":"../images/hombre.png",
+				"correo":"contra@gmail.com",
+				"idTipousuario":{
+					"descripcion":"Cliente",
+					"idTipousuario":2
+				},
+				"idUser":3,
+				"nic":"ContrerasCliente",
+				"nombre":"Fernando",
+				"pass":"RhEEE13c2nQ="
+			},
+			"nombre":"Fonda DoÃ±a Chonita",
+			"telefono":"5518300379",
+			"telefono2":"",
+			"visualizacion":2
+		},
+		"idUserC":4,
+		"nombre":"Alfonso",
+		"telefono":"7351234775"
+	},
+	{
+		"apellidos":"SD",
+		"correo":"alvaco93@gmail.com",
+		"direccion":"SFweffsdf",
+		"idNegocio":{
+			"descripcion":"<p>Esta es una descripción de la fonda dominicana</p>\n",
+			"direccion":"Calle Zaragoza No. 32",
+			"estado":0,
+			"fecha":"2018-01-20T22:00:05-06:00",
+			"idEstado":{
+				"idEstado":9,
+				"nombre":"Hidalgo"
+			},
+			"idMunicipio":{
+				"idMunicipio":10,
+				"nombreMun":"Atlapexco"
+			},
+			"idNegocio":6,
+			"idUser":{
+				"apellidos":"Vásquez Cortes",
+				"avatar":"images/hombre.png",
+				"correo":"alvaco93@hotmail.com",
+				"idTipousuario":{
+					"descripcion":"Cliente",
+					"idTipousuario":2
+				},
+				"idUser":12,
+				"nic":"AlDeDannia",
+				"nombre":"Alfonso",
+				"pass":"RhEEE13c2nQ="
+			},
+			"nombre":"Fonda la Dominicana",
+			"telefono":"7888424784",
+			"telefono2":"",
+			"visualizacion":2
+		},
+		"idUserC":6,
+		"nombre":"Daniel",
+		"telefono":"7778741287"
+	}
+]

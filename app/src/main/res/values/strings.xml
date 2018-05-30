@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Guissa mexico</string>
+    <string name="home_item">Home</string>
+    <string name="productos_item">Productos</string>
+    <string name="eventos_item">Eventos</string>
+    <string name="negocios_item">Negocios</string>
+    <string name="personal_item">Personal</string>
+    <string name="mi_negocio_item">Mi negocio</string>
+    <string name="facturas_item">Facturas</string>
+    <string name="log_out_item">Cerrar Sesión</string>
+    <string name="configuracion_item">Configuración</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="texto_cambiar_contrasena">Cambia tu contraseña</string>
+    <string name="etiqueta_contrasena">Contraseña</string>
+    <string name="etiqueta_info_usuario">Información del usuario</string>
+
+    <string name="titulo_tab_n_pedidos">Pedidos</string>
+    <string name="titulo_tab_n_clientes">Clientes</string>
+    <string name="titulo_tab_n_negocios">Negocio</string>
+    <string name="titulo_tab_n_perfil">Perfil</string>
+
+    <string name="titulo_tab_p_pedidos">Pedidos</string>
+    <string name="titulo_tab_p_negocios">Negocio</string>
+
+</resources>
