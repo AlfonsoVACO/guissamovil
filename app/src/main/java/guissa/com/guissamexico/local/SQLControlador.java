@@ -30,21 +30,23 @@ public class SQLControlador {
         dbhelper.close();
     }
 
-    public void insertarDatosNegocio(String correo) {
+    public void insertarDatosNegocio(String correo, String password) {
         ContentValues cv = new ContentValues();
         cv.put(DBhelper.NEGOCIO_CORREO, correo);
+        cv.put(DBhelper.NEGOCIO_PASS, password);
         database.insert(DBhelper.TABLE_MIS_NEGOCIOS, null, cv);
     }
 
-    public void insertarDatosPersonal(String correo) {
+    public void insertarDatosPersonal(int id, String correo) {
         ContentValues cv = new ContentValues();
         cv.put(DBhelper.PERSONAL_CORREO, correo);
+        cv.put(DBhelper.USERC_ID, id);
 
         database.insert(DBhelper.TABLE_MIS_DATOS, null, cv);
     }
 
     public Cursor getDatosPersonal() {
-        String[] todasLasColumnas = new String[] { DBhelper.PERSONAL_ID, DBhelper.PERSONAL_CORREO };
+        String[] todasLasColumnas = new String[] { DBhelper.PERSONAL_ID, DBhelper.USERC_ID, DBhelper.PERSONAL_CORREO };
         Cursor c = database.query(DBhelper.TABLE_MIS_DATOS, todasLasColumnas,
                 null, null, null, null, null);
 
@@ -55,7 +57,7 @@ public class SQLControlador {
     }
 
     public Cursor getDatosNegocio() {
-        String[] todasLasColumnas = new String[] { DBhelper.NEGOCIO_ID, DBhelper.NEGOCIO_CORREO };
+        String[] todasLasColumnas = new String[] { DBhelper.NEGOCIO_ID, DBhelper.NEGOCIO_CORREO, DBhelper.NEGOCIO_PASS };
         Cursor c = database.query(DBhelper.TABLE_MIS_NEGOCIOS, todasLasColumnas, null,
                 null, null, null, null);
 

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -14,11 +15,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -26,44 +23,42 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import guissa.com.guissamexico.R;
-import guissa.com.guissamexico.adaptadores.AdaptadorPNegocio;
 import guissa.com.guissamexico.adaptadores.AdaptadorPPedidos;
 import guissa.com.guissamexico.local.SQLControlador;
-import guissa.com.guissamexico.modelo.Estados;
-import guissa.com.guissamexico.modelo.Municipios;
-import guissa.com.guissamexico.modelo.Negocios;
-import guissa.com.guissamexico.modelo.TipoUsuario;
-import guissa.com.guissamexico.modelo.User;
+import guissa.com.guissamexico.modelo.ApiError;
+import guissa.com.guissamexico.modelo.Reservacion;
 import guissa.com.guissamexico.modelo.Userc;
-import guissa.com.guissamexico.swiplist.BaseSwipListAdapter;
+import guissa.com.guissamexico.utilidades.Constantes;
+import guissa.com.guissamexico.web.SaludMockApi;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Alfonso on 17/02/2018.
  */
 
-public class FragmentoPPedidos extends Fragment {
+public class FragmentoPPedidos extends Fragment{
+
+    private Retrofit mRestAdapter;
+    private SaludMockApi mSaludMockApi;
+    private Retrofit mRestAdapterReserva;
+    private SaludMockApi mSaludMockApiReserva;
+
+    private List<Userc> cliente;
+    private List<Reservacion> listapedidos = new ArrayList<>();
 
     private List<ApplicationInfo> mAppList;
-    private AppAdapter mAdapter;
+    private AdaptadorPPedidos mAdapter;
     private SwipeMenuListView mListView;
     private SQLControlador dbconeccion;
     Map<String,Object> mapa_de_datos;
@@ -74,168 +69,71 @@ public class FragmentoPPedidos extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragmento_personal_pedidos, container, false);
-
         mapa_de_datos = getDatosPersonales();
 
         if(!mapa_de_datos.isEmpty()){
-            //getAcciones(view); // esta registrado
-
+            getAcciones(view); // esta registrado
         }else{
             getLoggin();
             mapa_de_datos = getDatosPersonales();
             if(!mapa_de_datos.isEmpty()){
-                //getAcciones(view); // esta registrado
+                getAcciones(view); // esta registrado
             }
         }
-        getLogginVolley(view);
         return view;
     }
 
-    public String loadJSONFromAsset(String flName) {
-        String json = null;
-        try {
-            InputStream is = getContext().getAssets().open(flName);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-            Log.v("MainActivity", "Load json ok");
-        } catch (IOException ex) {
-            Log.v("MainActivity", "Error: " + ex.getMessage());
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
 
-    private void getLogginVolley(View view){
-        ListView lvCities = (ListView) view.findViewById(R.id.pager_personal_pedidos);
-        ArrayList<Userc> lstuserc = new ArrayList<Userc>();
 
-        try {
-            Toast.makeText(getContext(), loadJSONFromAsset("userc.json"), Toast.LENGTH_LONG);
-            HttpGet httpGet = new HttpGet(loadJSONFromAsset("userc.json"));
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpResponse response = (HttpResponse) httpClient.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            BufferedHttpEntity buffer = new BufferedHttpEntity(entity);
-            InputStream iStream = buffer.getContent();
+    private void iniciarSesionClienteAds(String correo){
+        mRestAdapter = new Retrofit.Builder()
+                .baseUrl(Constantes.GET_USERC)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-            String aux = "";
-
-            BufferedReader r = new BufferedReader(new InputStreamReader(iStream));
-            String line;
-            while ((line = r.readLine()) != null) {
-                aux += line;
-            }
-
-            JSONObject jsonObject = new JSONObject(aux);
-            JSONArray cities = jsonObject.names();
-
-            for(int i = 0; i < cities.length(); i++) {
-                JSONObject json_negocio = cities.getJSONObject(i);
-
-                Userc userc = new Userc();
-
-                userc.setApellidos( json_negocio.getString("apellidos") );
-                userc.setCorreo( json_negocio.getString("correo") );
-                userc.setDireccion( json_negocio.getString("direccion") );
-                userc.setIdUserC( json_negocio.getInt("idUserC") );
-                userc.setNombre( json_negocio.getString("nombre") );
-                userc.setTelefono( json_negocio.getString("telefono") );
-
-                Negocios negocio = new Negocios();
-
-                negocio.setDescripcion(json_negocio.getJSONObject("idNegocio").getString("descripcion"));
-                negocio.setDireccion(json_negocio.getJSONObject("idNegocio").getString("direccion"));
-                negocio.setEstado(json_negocio.getJSONObject("idNegocio").getInt("estado"));
-                //negocio.setFecha(json_negocio.getJSONObject("idNegocio").getString("fecha"));
-                negocio.setIdNegocio(json_negocio.getJSONObject("idNegocio").getInt("idNegocio"));
-                negocio.setNombre(json_negocio.getJSONObject("idNegocio").getString("nombre"));
-                negocio.setTelefono(json_negocio.getJSONObject("idNegocio").getString("telefono"));
-                negocio.setTelefono2(json_negocio.getJSONObject("idNegocio").getString("telefono2"));
-                negocio.setVisualizacion(json_negocio.getJSONObject("idNegocio").getInt("visualizacion"));
-
-                Estados estado = new Estados();
-
-                estado.setIdEstado(json_negocio.getJSONObject("idNegocio").getJSONObject("idEstado").getInt("idEstado"));
-                estado.setNombre(json_negocio.getJSONObject("idNegocio").getJSONObject("idEstado").getString("nombre"));
-
-                Municipios muni = new Municipios();
-                muni.setIdMunicipio(json_negocio.getJSONObject("idNegocio").getJSONObject("idMunicipio").getInt("idMunicipio"));
-                muni.setIdMunicipio(json_negocio.getJSONObject("idNegocio").getJSONObject("idMunicipio").getInt("nombreMun"));
-
-                negocio.setIdEstado(estado);
-                negocio.setIdMunicipio(muni);
-
-                User user = new User();
-                user.setIdUser(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getInt("idUser"));
-                user.setApellidos(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getString("apellidos"));
-                //user.setAvatar(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getString("avatar"));
-                user.setCorreo(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getString("correo"));
-                user.setNic(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getString("nic"));
-                user.setNombre(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getString("nombre"));
-                user.setPass(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getString("pass"));
-
-                TipoUsuario tipo = new TipoUsuario();
-                tipo.setIdTipoUsuario(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getJSONObject("idTipousuario").getInt("idTipousuario"));
-                tipo.setDescripcion(json_negocio.getJSONObject("idNegocio").getJSONObject("idUser").getJSONObject("idTipousuario").getString("descripcion"));
-
-                user.setIdTipousuario(tipo);
-                negocio.setIdUser(user);
-                userc.setIdNegocio(negocio);
-
-                lstuserc.add(userc);
-            }
-        }
-        catch(Exception e) {
-            Log.e("WebService", e.getMessage());
-        }
-
-        AdaptadorPPedidos adaptadorPNegocio = new AdaptadorPPedidos(getActivity(), lstuserc);
-        lvCities.setAdapter(adaptadorPNegocio);
-        lvCities.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mSaludMockApi = mRestAdapter.create(SaludMockApi.class);
+        Call<List<Userc>> loginCall = mSaludMockApi.getClienteAdsMock( correo );
+        loginCall.enqueue(new Callback<List<Userc>>() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                /*clave = (TextView) view.findViewById(R.id.negocio_p_id);
-                nombre = (TextView) view.findViewById(R.id.texto_nombre);
-                direccion = (TextView) view.findViewById(R.id.texto_direccion);
-                ciudad = (TextView) view.findViewById(R.id.texto_ciudad);
-                telefono = (TextView) view.findViewById(R.id.texto_telefono);
+            public void onResponse(Call<List<Userc>> call, Response<List<Userc>> response) {
 
+                if (!response.isSuccessful()) {
+                    String error = "Ha ocurrido un error. Contacte al administrador";
+                    if (response.errorBody()
+                            .contentType()
+                            .subtype()
+                            .equals("json")) {
+                        ApiError apiError = ApiError.fromResponseBody( response.errorBody() );
 
-                String aux_clave = clave.getText().toString();
-                final String aux_nombre = nombre.getText().toString();
-                final String aux_precio = direccion.getText().toString();
-                final String aux_ciudad = ciudad.getText().toString();
-                final String aux_telefono = telefono.getText().toString();*/
+                        error = apiError.getMessage() != null ? apiError.getMessage() : "";
+                        Log.d("FragmentoPPedidos", apiError.getDeveloperMessage());
+                    } else {
+                        try {
+                            Log.d("FragmentoPPedidos", response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return;
+                }
+                if(response.body() != null) {
+                    setUserc( response.body() );
+                }else{
+                    Toast.makeText( getContext(), "Revisa tu conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Userc>> call, Throwable t) {
+                Toast.makeText( getContext(), "Error al cargar datos", Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private boolean showAccessDenied(){
-        final boolean[] verificalogin = {true};
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Acceso denegado");
-        builder.setMessage("Ese usuario no existe, ¿Deseas volver a intentar?");
-
-        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                verificalogin[0] = true;
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                verificalogin[0] = false;
-            }
-        });
-        builder.show();
-        return verificalogin[0];
+    private void setUserc(List<Userc> cliente){
+        for( Userc userc : cliente){
+            this.cliente.add( userc );
+        }
     }
 
     private void getLoggin(){
@@ -252,7 +150,9 @@ public class FragmentoPPedidos extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 String correo = input.getText().toString();
-                guardarDatosPersonales(correo);
+                iniciarSesionClienteAds( correo );
+                if( !cliente.isEmpty() )
+                    guardarDatosPersonales();
             }
         });
         builder.show();
@@ -267,7 +167,8 @@ public class FragmentoPPedidos extends Fragment {
         if (cursor.moveToFirst()) {
             do {
                 arreglo_datos.put( "id", cursor.getInt(0) );
-                arreglo_datos.put( "correo", cursor.getString(1) );
+                arreglo_datos.put( "iduserc", cursor.getInt(1) );
+                arreglo_datos.put( "correo", cursor.getString(2) );
 
             } while (cursor.moveToNext());
             cursor.close();
@@ -277,10 +178,12 @@ public class FragmentoPPedidos extends Fragment {
         return arreglo_datos;
     }
 
-    private void guardarDatosPersonales(String correo){
+    private void guardarDatosPersonales(){
         dbconeccion = new SQLControlador(getContext());
         dbconeccion.abrirBaseDeDatos();
-        dbconeccion.insertarDatosPersonal(correo);
+        for(Userc userc : this.cliente){
+            dbconeccion.insertarDatosPersonal(userc.getIdUserC(), userc.getCorreo());
+        }
         dbconeccion.cerrar();
     }
 
@@ -290,17 +193,19 @@ public class FragmentoPPedidos extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
-
         mAppList = getActivity().getPackageManager().getInstalledApplications(0);
-
         mListView = (SwipeMenuListView) view.findViewById(R.id.pager_personal_pedidos);
 
-        mAdapter = new AppAdapter();
+        // iduser listo, traer los negocios vinculados
+        for(Userc userc : this.cliente){
+            getReservaciones( userc.getIdUserC() );
+        }
+
+        mAdapter = new AdaptadorPPedidos( getActivity(), listapedidos );
         mListView.setAdapter(mAdapter);
 
         mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
@@ -329,7 +234,7 @@ public class FragmentoPPedidos extends Fragment {
             }
         };
 
-        mListView.setMenuCreator(creator);
+        mListView.setMenuCreator( creator );
 
         mListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
@@ -348,37 +253,20 @@ public class FragmentoPPedidos extends Fragment {
         });
 
         mListView.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+            @Override
+            public void onSwipeStart(int position) {}
 
             @Override
-            public void onSwipeStart(int position) {
-                // swipe start
-            }
-
-            @Override
-            public void onSwipeEnd(int position) {
-                // swipe end
-            }
+            public void onSwipeEnd(int position) {}
         });
 
         mListView.setOnMenuStateChangeListener(new SwipeMenuListView.OnMenuStateChangeListener() {
             @Override
-            public void onMenuOpen(int position) {
-            }
+            public void onMenuOpen(int position) {}
 
             @Override
-            public void onMenuClose(int position) {
-            }
+            public void onMenuClose(int position) {}
         });
-
-        /*mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                           int position, long id) {
-                Toast.makeText(getContext(), position + " long click", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });*/
     }
 
     private AlertDialog accionEliminar(int id){
@@ -392,91 +280,59 @@ public class FragmentoPPedidos extends Fragment {
         return builder.create();
     }
 
-    class AppAdapter extends BaseSwipListAdapter {
-
-        @Override
-        public int getCount() {
-            return mAppList.size();
-        }
-
-        @Override
-        public ApplicationInfo getItem(int position) {
-            return mAppList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = View.inflate(getContext(),
-                        R.layout.lista_p_pedidos, null);
-                new ViewHolder(convertView);
-            }
-            ViewHolder holder = (ViewHolder) convertView.getTag();
-            ApplicationInfo item = getItem(position);
-            holder.tv_name.setText(item.loadLabel(getActivity().getPackageManager()));
-            /*holder.tv_name.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getContext(),"iv_icon_click",Toast.LENGTH_SHORT).show();
-                }
-            });*/
-            return convertView;
-        }
-
-        class ViewHolder {
-            ImageView iv_icon;
-            TextView tv_name;
-
-            public ViewHolder(View view) {
-                //iv_icon = (ImageView) view.findViewById(R.id.iv_icon);
-                tv_name = (TextView) view.findViewById(R.id.texto_departamento);
-                view.setTag(this);
-            }
-        }
-
-        @Override
-        public boolean getSwipEnableByPosition(int position) {
-            if(position % 2 == 0){
-                return false;
-            }
-            return true;
-        }
-    }
-
     private int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics());
     }
 
-   /* @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+    private void setReservaciones(List<Reservacion> reservaciones ){
+        for(Reservacion reservacion : reservaciones){
+            this.listapedidos.add( reservacion );
+        }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
+    private void getReservaciones(int id){
+        mRestAdapterReserva = new Retrofit.Builder()
+                .baseUrl(Constantes.GET_RESRVACION)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        mSaludMockApiReserva = mRestAdapterReserva.create(SaludMockApi.class);
+        Call< List<Reservacion> > loginCall = mSaludMockApiReserva.getReservacionMock( id );
+        loginCall.enqueue(new Callback< List<Reservacion> >() {
+            @Override
+            public void onResponse(Call< List<Reservacion> > call, Response< List<Reservacion> > response) {
+
+                if (!response.isSuccessful()) {
+                    String error = "Ha ocurrido un error. Contacte al administrador";
+                    if (response.errorBody()
+                            .contentType()
+                            .subtype()
+                            .equals("json")) {
+                        ApiError apiError = ApiError.fromResponseBody( response.errorBody() );
+
+                        error = apiError.getMessage() != null ? apiError.getMessage() : "";
+                        Log.d("FragmentoPPedidos", apiError.getDeveloperMessage());
+                    } else {
+                        try {
+                            Log.d("FragmentoPPedidos", response.errorBody().string());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return;
+                }
+                if(response.body() != null) {
+                    setReservaciones( response.body() );
+                }else{
+                    Toast.makeText( getContext(), "Revisa tu conexión", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call< List<Reservacion> > call, Throwable t) {
+                Toast.makeText( getContext(), "Error al cargar datos", Toast.LENGTH_LONG).show();
+            }
+        });
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_left) {
-            mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-            return true;
-        }
-        if (id == R.id.action_right) {
-            mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_RIGHT);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }**/
 }

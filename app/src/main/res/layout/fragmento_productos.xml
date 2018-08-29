@@ -69,7 +69,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
+                <!--<ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/reciclador_productos"
+                    android:scrollbars="vertical"/>-->
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/reciclador_productos"
                     android:layout_width="match_parent"

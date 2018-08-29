@@ -16,24 +16,29 @@ public class DBhelper extends SQLiteOpenHelper {
         super(context, DB_NAME, null,DB_VERSION);
     }
 
-    static final String DB_NAME = "guissa_nexico";
+    static final String DB_NAME = "guissamexico";
     static final int DB_VERSION = 1;
 
     public static final String TABLE_MIS_NEGOCIOS = "negocios";
     public static final String TABLE_MIS_DATOS = "personal";
 
     public static final String NEGOCIO_ID = _ID;
+    public static final String USERC_ID = "usercid";
     public static final String NEGOCIO_CORREO = "correo";
+    public static final String NEGOCIO_PASS = "pass";
 
     public static final String PERSONAL_ID = _ID;
     public static final String PERSONAL_CORREO ="correo";
 
-    public static final String CREATE_TABLE_NEGOCIOS = "create table " +TABLE_MIS_NEGOCIOS+"(" +
+    public static final String CREATE_TABLE_NEGOCIOS = "create table " +
+            TABLE_MIS_NEGOCIOS + "(" +
             NEGOCIO_ID + " integer primary key AUTOINCREMENT," +
-            NEGOCIO_CORREO + " char(70) not null);";
+            NEGOCIO_CORREO + " char(70) not null, " + NEGOCIO_PASS + " char(70) not null );";
 
-    public static final String CREATE_TABLE_PERSONAL = "create table " +TABLE_MIS_DATOS+"(" +
+    public static final String CREATE_TABLE_PERSONAL = "create table " +
+            TABLE_MIS_DATOS+"(" +
             PERSONAL_ID + " integer primary key AUTOINCREMENT," +
+            USERC_ID + " integer not null," +
             PERSONAL_CORREO + " char(70) not null);";
 
     @Override
@@ -44,8 +49,8 @@ public class DBhelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_NEGOCIOS);
-        db.execSQL("DROP TABLE IF EXISTS " + CREATE_TABLE_PERSONAL);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MIS_NEGOCIOS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MIS_DATOS);
         onCreate(db);
     }
 }

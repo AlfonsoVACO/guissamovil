@@ -115,7 +115,15 @@ public class Userc {
 
     @Override
     public String toString() {
-        return "com.guissa.guissa.models.entidades.Userc[ idUserC=" + idUserC + " ]";
+        return "Userc{" +
+                "idUserC=" + idUserC +
+                ", nombre='" + nombre + '\'' +
+                ", apellidos='" + apellidos + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", direccion='" + direccion + '\'' +
+                ", idNegocio=" + idNegocio +
+                ", reservacionList=" + reservacionList +
+                '}';
     }
-    
 }

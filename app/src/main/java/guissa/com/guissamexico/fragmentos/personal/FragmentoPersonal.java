@@ -16,11 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import guissa.com.guissamexico.R;
-import guissa.com.guissamexico.fragmentos.negocios.FragmentoNClientes;
-import guissa.com.guissamexico.fragmentos.negocios.FragmentoNNegocios;
-import guissa.com.guissamexico.fragmentos.negocios.FragmentoNPedidos;
-import guissa.com.guissamexico.fragmentos.negocios.FragmentoNPerfil;
-import guissa.com.guissamexico.fragmentos.negocios.FragmentoNegocio;
 
 /**
  * Created by Alfonso on 17/02/2018.

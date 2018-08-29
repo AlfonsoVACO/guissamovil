@@ -6,20 +6,14 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Created by Alfonso on 20/02/2018.
  */
 
 public class Recursos {
-
-    private static String cadena_json = "";
-    private static JSONObject jsonObj = null;
 
     public Bitmap conertByteArrayToBitMap(byte[] arreglo_bytes){
         return BitmapFactory.decodeByteArray(arreglo_bytes, 0, arreglo_bytes.length);

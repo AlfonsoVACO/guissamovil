@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import guissa.com.guissamexico.R;
@@ -35,6 +36,7 @@ import guissa.com.guissamexico.adaptadores.AdaptadorPNegocio;
 import guissa.com.guissamexico.local.SQLControlador;
 import guissa.com.guissamexico.modelo.Estados;
 import guissa.com.guissamexico.modelo.Negocios;
+import guissa.com.guissamexico.modelo.Userc;
 import guissa.com.guissamexico.utilidades.Constantes;
 
 /**
@@ -159,7 +161,8 @@ public class FragmentoPNegocios extends Fragment {
         if (cursor.moveToFirst()) {
             do {
                 arreglo_datos.put( "id", cursor.getInt(0) );
-                arreglo_datos.put( "correo", cursor.getString(1) );
+                arreglo_datos.put( "iduserc", cursor.getInt(1) );
+                arreglo_datos.put( "correo", cursor.getString(2) );
 
             } while (cursor.moveToNext());
             cursor.close();
@@ -183,16 +186,18 @@ public class FragmentoPNegocios extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 String correo = input.getText().toString();
-                guardarDatosPersonales(correo);
+                //guardarDatosPersonales(correo);
             }
         });
         builder.show();
     }
 
-    private void guardarDatosPersonales(String correo){
+    private void guardarDatosPersonales(List<Userc> correo){
         dbconeccion = new SQLControlador(getContext());
         dbconeccion.abrirBaseDeDatos();
-        dbconeccion.insertarDatosPersonal(correo);
+        for(Userc userc : correo){
+            dbconeccion.insertarDatosPersonal(userc.getIdUserC(), userc.getCorreo());
+        }
         dbconeccion.cerrar();
     }
 }

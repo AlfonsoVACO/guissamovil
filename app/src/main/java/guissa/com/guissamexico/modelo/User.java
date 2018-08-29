@@ -1,5 +1,6 @@
 package guissa.com.guissamexico.modelo;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class User {
@@ -189,7 +190,23 @@ public class User {
 
     @Override
     public String toString() {
-        return "com.guissa.guissa.models.entidades.User[ idUser=" + idUser + " ]";
+        return "User{" +
+                "idUser=" + idUser +
+                ", nombre='" + nombre + '\'' +
+                ", apellidos='" + apellidos + '\'' +
+                ", correo='" + correo + '\'' +
+                ", nic='" + nic + '\'' +
+                ", pass='" + pass + '\'' +
+                ", avatar=" + Arrays.toString(avatar) +
+                ", recetaList=" + recetaList +
+                ", notasList=" + notasList +
+                ", productoList=" + productoList +
+                ", negociosList=" + negociosList +
+                ", eventoList=" + eventoList +
+                ", patrocinadorList=" + patrocinadorList +
+                ", resetopassList=" + resetopassList +
+                ", bannerList=" + bannerList +
+                ", idTipousuario=" + idTipousuario +
+                '}';
     }
-    
 }

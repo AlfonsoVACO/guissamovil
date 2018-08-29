@@ -19,20 +19,21 @@ import android.view.MenuItem;
 
 import guissa.com.guissamexico.actividades.ActividadConfiguracion;
 import guissa.com.guissamexico.fragmentos.*;
-import guissa.com.guissamexico.fragmentos.negocios.FragmentoNegocio;
 import guissa.com.guissamexico.fragmentos.personal.FragmentoPersonal;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
+    private int[] clavesCliente;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        Intent i = getIntent();
+        clavesCliente = i.getIntArrayExtra("claveId");
         Toolbar toolbar = agregatToolbar();
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -135,9 +136,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_personal:
                 fragmentoGenerico = new FragmentoPersonal();
-                break;
-            case R.id.nav_negocio:
-                fragmentoGenerico = new FragmentoNegocio();
                 break;
             /*case R.id.nav_configurate:
                 startActivity(new Intent(this, ActividadConfiguracion.class));
